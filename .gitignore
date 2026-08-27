@@ -1,0 +1,3 @@
+.venv/
+rivers.db
+__pycache__/
