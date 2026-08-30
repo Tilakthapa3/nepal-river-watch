@@ -2,3 +2,4 @@
 rivers.db
 __pycache__/
 .env
+last_alerted.json
