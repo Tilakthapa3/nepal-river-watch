@@ -4,3 +4,4 @@ __pycache__/
 .env
 last_alerted.json
 watch.log
+watch.log
