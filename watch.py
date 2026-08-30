@@ -12,6 +12,7 @@ import alert
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "last_alerted.json")
 STALE_MINUTES = 90
+WATCH_COUNT = 15
 HEARTBEAT_MINUTES = 15
 NPT = timezone(timedelta(hours=5, minutes=45), "NPT")
 
@@ -94,9 +95,13 @@ def format_heartbeat(fresh, stale, skipped):
 
     if watch:
         lines.append("Closest to threshold:")
-        for s in watch[:3]:
+        for s in watch[:WATCH_COUNT]:
             gap = "{:+.2f}m".format(margin(s))
-            lines.append(gap + "  " + s["name"])
+            lines.append("<b>" + gap + "</b>  " + s["name"])
+            detail = "   {:.2f}m of {:.2f}m, {}".format(
+                s["water_level"], s["warning_level"],
+                s["trend"] or "unknown")
+            lines.append(detail)
         lines.append("")
 
     lines.append("Source: DHM, Government of Nepal.")
