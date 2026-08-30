@@ -1,3 +1,4 @@
 .venv/
 rivers.db
 __pycache__/
+.env
