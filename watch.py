@@ -121,7 +121,7 @@ def heartbeat_due():
     if sent.tzinfo is None:
         return True
     gap = npt_now() - sent
-    return gap >= timedelta(minutes=HEARTBEAT_MINUTES - 1)
+    return gap >= timedelta(minutes=0)
 
 
 def mark_heartbeat():
