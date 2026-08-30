@@ -9,9 +9,10 @@ from datetime import datetime, timezone, timedelta
 import fetch_rivers as rw
 import alert
 
-STATE_FILE = "last_alerted.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATE_FILE = os.path.join(BASE_DIR, "last_alerted.json")
 STALE_MINUTES = 90
-HEARTBEAT_HOUR = 8
+HEARTBEAT_MINUTES = 15
 NPT = timezone(timedelta(hours=5, minutes=45), "NPT")
 
 
@@ -76,7 +77,7 @@ def format_alert(stations):
 
 def format_heartbeat(fresh, stale, skipped):
     lines = []
-    lines.append("<b>Daily check</b>")
+    lines.append("<b>River update</b>")
     lines.append(npt_now().strftime("%Y-%m-%d %H:%M NPT"))
     lines.append("")
     lines.append("All rivers below warning level.")
@@ -103,17 +104,24 @@ def format_heartbeat(fresh, stale, skipped):
 
 
 def heartbeat_due():
-    """One heartbeat per day, at the first run after HEARTBEAT_HOUR NPT."""
-    today = npt_now().strftime("%Y-%m-%d")
+    """Post an update every HEARTBEAT_MINUTES."""
     state = load_state()
-    if state.get("heartbeat_date") == today:
-        return False
-    return npt_now().hour >= HEARTBEAT_HOUR
+    last = state.get("heartbeat_date")
+    if not last:
+        return True
+    try:
+        sent = datetime.fromisoformat(last)
+    except ValueError:
+        return True
+    if sent.tzinfo is None:
+        return True
+    gap = npt_now() - sent
+    return gap >= timedelta(minutes=HEARTBEAT_MINUTES - 1)
 
 
 def mark_heartbeat():
     state = load_state()
-    state["heartbeat_date"] = npt_now().strftime("%Y-%m-%d")
+    state["heartbeat_date"] = npt_now().isoformat()
     save_state(state)
 
 
