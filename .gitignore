@@ -3,5 +3,6 @@ rivers.db
 __pycache__/
 .env
 last_alerted.json
+outage.json
 watch.log
 watch.log

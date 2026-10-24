@@ -96,8 +96,16 @@ def parse_station(raw):
 def fetch():
     resp = requests.post(API_URL, timeout=TIMEOUT)
     resp.raise_for_status()
-    payload = resp.json()
+    try:
+        payload = resp.json()
+    except ValueError:
+        # Usually an error or block page; show its start so the cause is clear
+        start = " ".join(resp.text.split())[:120]
+        kind = resp.headers.get("Content-Type", "no content type")
+        raise RuntimeError("DHM did not send JSON (" + kind + "): " + start)
 
+    if not isinstance(payload, dict):
+        raise RuntimeError("Unexpected DHM reply: " + str(payload)[:120])
     if payload.get("status") != "success":
         raise RuntimeError("API returned status: " + str(payload.get("status")))
 
