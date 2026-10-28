@@ -1,5 +1,6 @@
 """Check Nepal river levels and post alerts to Telegram."""
 
+import html
 import json
 import os
 import sys
@@ -187,12 +188,14 @@ def run():
 def main():
     try:
         run()
-    except Exception:
+    except Exception as exc:
         traceback.print_exc()
         try:
             when = npt_now().strftime("%Y-%m-%d %H:%M NPT")
+            detail = html.escape("{}: {}".format(type(exc).__name__, exc))
             alert.send("<b>River Watch error</b>\n" + when +
-                       "\nThe check failed. Alerts may be missing.")
+                       "\nThe check failed. Alerts may be missing." +
+                       "\n" + detail)
         except Exception:
             print("Could not send the failure notice either.")
         sys.exit(1)
